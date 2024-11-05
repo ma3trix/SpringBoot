@@ -52,7 +52,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/feedApp
     username: postgres
-    password: postgres
+    password: pg123
     hikari:
       maximum-pool-size: 2
   jpa:

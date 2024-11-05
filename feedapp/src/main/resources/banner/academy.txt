@@ -1,0 +1,20 @@
+${Ansi.DEFAULT}
+${Ansi.GREEN}  ________ ___.         .__   .___.__    _____                    .___
+${Ansi.GREEN}  \_____ \\_ |__  _____|__| __| _/|__|  / _ \  ____ _____    __| _/____  _____ ___.__.
+${Ansi.GREEN}   /  |  \| __ \ / ___/ |/ __ | | | / /_\ \_/ ___\\__ \  / __ |/ __ \ /    <  | |
+${Ansi.GREEN}  /   |   \ \_\ \\___ \| / /_/ | | | /   |   \ \___ / __ \_/ /_/ \ ___/| Y Y \___ |
+${Ansi.GREEN}  \_______ /___ /____ >__\____ | |__| \____|__ /\___ >____ /\____ |\___ >__|_| / ____|
+${Ansi.GREEN}          \/   \/    \/       \/             \/    \/    \/     \/   \/     \/\/
+${Ansi.GREEN}
+${Ansi.GREEN}                 Obsidi Academy 2024 - Full Stack Java Developer Bootcamp.
+${Ansi.RED}                              :: Spring Boot${spring-boot.formatted-version} ::
+${Ansi.DEFAULT}
+
+
+
+
+
+
+
+
+
