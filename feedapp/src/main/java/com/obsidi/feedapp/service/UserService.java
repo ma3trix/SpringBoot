@@ -5,6 +5,8 @@ import com.obsidi.feedapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,5 +29,26 @@ public class UserService {
     // Saves a new user to the database
     public void createUser(User user) {
         this.userRepository.save(user);
+    }
+
+    // Registers a new user with duplicate email check
+    public User signup(User user) {
+        // Check for duplicate email
+        if (userRepository.findByEmailId(user.getEmailId()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        // Convert username and emailId to lowercase
+        user.setUsername(user.getUsername().toLowerCase());
+        user.setEmailId(user.getEmailId().toLowerCase());
+
+        // Set emailVerified to false
+        user.setEmailVerified(false);
+
+        // Set createdOn to the current timestamp
+        user.setCreatedOn(Timestamp.from(Instant.now()));
+
+        // Save the user to the database
+        return this.userRepository.save(user);
     }
 }

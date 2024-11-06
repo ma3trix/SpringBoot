@@ -63,4 +63,11 @@ public class UserController {
 
         return "User Created Successfully";
     }
+
+    // Endpoint to sign up a new user
+    @PostMapping("/signup")
+    public User signup(@RequestBody User user) {
+        logger.debug("Signing up, username: {}", user.getUsername());
+        return this.userService.signup(user);
+    }
 }
