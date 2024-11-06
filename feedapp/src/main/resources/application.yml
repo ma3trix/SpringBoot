@@ -50,7 +50,7 @@ spring:
 
   # Database Settings
   datasource:
-    url: jdbc:postgresql://localhost:5432/feedApp
+    url: jdbc:postgresql://localhost:5432/feedapp
     username: postgres
     password: pg123
     hikari:
