@@ -67,7 +67,7 @@ spring:
   # Email Settings
   mail:
     username: malikintended@gmail.com
-    password: zqmrhhsfpfboyqwi
+    password: zqmrhhsfpfboyqwl
     host: smtp.gmail.com
     port: 587
     protocol: smtp

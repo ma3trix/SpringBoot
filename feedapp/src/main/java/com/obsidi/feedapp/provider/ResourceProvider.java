@@ -1,13 +1,12 @@
 package com.obsidi.feedapp.provider;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import com.obsidi.feedapp.provider.factory.YamlPropertySourceFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 @Component
-// @PropertySource(value = "classpath:config.yml", factory =
-// YamlPropertySourceFactory.class)
+@PropertySource(value = "classpath:config.yml", factory = YamlPropertySourceFactory.class)
 public class ResourceProvider {
 
     @Value("${jwt.secret}")

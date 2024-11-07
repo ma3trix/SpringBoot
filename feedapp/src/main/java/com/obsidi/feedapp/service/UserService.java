@@ -37,6 +37,7 @@ public class UserService {
     // Registers a new user with duplicate email check
     public User signup(User user) {
         // Check for duplicate email
+        this.emailService.sendVerificationEmail(user);
         if (userRepository.findByEmailId(user.getEmailId()).isPresent()) {
             throw new IllegalArgumentException("Email already exists");
         }
