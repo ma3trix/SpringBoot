@@ -16,6 +16,9 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    EmailService emailService;
+
     // Retrieves all users from the database
     public List<User> listUsers() {
         return this.userRepository.findAll();
@@ -49,6 +52,11 @@ public class UserService {
         user.setCreatedOn(Timestamp.from(Instant.now()));
 
         // Save the user to the database
-        return this.userRepository.save(user);
+        User savedUser = this.userRepository.save(user);
+
+        // Send verification email
+        this.emailService.sendVerificationEmail(savedUser);
+
+        return savedUser;
     }
 }
