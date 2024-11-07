@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <title>Verification Email</title>
+</head>
+
+<body>
+    
+    <div>Welcome <b th:text="${user.firstName} + ' ' + ${user.lastName}"></b>!</div>
+    <div> Your username is <b th:text="${user.username}"></b></div>
+    <div>
+        <p>Click the following link to confirm your email and finish signing up for the FeedApp:</p>
+        <p th:text="${client} + '/' + ${param} + '?token=' + ${token}"></p>
+        <p>This link is valid for 24 hours.</p>
+        <p>If you did not sign up for the FeedApp, ignore this email.</p>
+        <p>Need help or have questions?</p>
+        <p>Call us Monday to Friday, from 8:30 a.m. to 5 p.m. Eastern time, excluding holidays:
+           • Toll-free:1-800-268-0097
+           • Toll-free TTY: 1-800-269-0095
+        </p>
+    </div>
+    
+</body>
+
+</html>

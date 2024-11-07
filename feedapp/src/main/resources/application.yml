@@ -58,3 +58,22 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+      # Jackson Settings
+  jackson:
+    time-zone: America/Toronto
+    date-format: "yyyy-MM-dd HH:mm:ss"
+
+  # Email Settings
+  mail:
+    username: malikintended@gmail.com
+    password: zqmrhhsfpfboyqwi
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
