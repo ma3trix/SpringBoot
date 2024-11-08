@@ -59,7 +59,7 @@ spring:
     hibernate:
       ddl-auto: validate
 
-      # Jackson Settings
+  # Jackson Settings
   jackson:
     time-zone: America/Toronto
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -77,3 +77,50 @@ spring:
           auth: true
           starttls:
             enable: true
+
+---
+# Prod Profile
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/feedApp
+    username: postgres
+    password: pg123
+    hikari:
+      maximum-pool-size: 2
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+---
+# Test Profile
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  sql.init:
+    mode: always
+    continue-on-error: false
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: sa123#
+    driverClassName: org.h2.Driver
+  jpa:
+    hibernate.ddl-auto: create-drop
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        trace: false
+        web-allow-others: true
