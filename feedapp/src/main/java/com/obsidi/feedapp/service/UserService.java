@@ -1,11 +1,13 @@
 package com.obsidi.feedapp.service;
 
 import com.obsidi.feedapp.exception.EmailExistException;
+import com.obsidi.feedapp.exception.UserNotFoundException;
 import com.obsidi.feedapp.exception.UsernameExistException;
 import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.repository.UserRepository;
 import com.obsidi.feedapp.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
+// Removed incorrect import statement
 @Service
 public class UserService {
 
@@ -73,5 +78,17 @@ public class UserService {
         this.emailService.sendVerificationEmail(user);
 
         return user;
+    }
+
+    public void verifyEmail() {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+
+        user.setEmailVerified(true);
+
+        this.userRepository.save(user);
     }
 }
