@@ -62,6 +62,13 @@ public class EmailService {
     }
 
     @Async
+    public void sendResetPasswordEmail(User user) {
+
+        this.sendEmail(user, this.provider.getClientResetParam(), "reset_password", "Reset your password",
+                this.provider.getClientResetExpiration());
+    }
+
+    @Async
     public void sendVerificationEmail(User user) {
         logger.info("Attempting to send verification email to user: {}", user.getEmailId());
         this.sendEmail(user, this.provider.getClientVerifyParam(), "verify_email",
