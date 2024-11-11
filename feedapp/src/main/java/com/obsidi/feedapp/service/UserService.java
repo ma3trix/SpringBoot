@@ -101,9 +101,15 @@ public class UserService {
 
     public User authenticate(User user) {
         this.authenticate(user.getUsername(), user.getPassword());
-        return this.userRepository.findByUsername(user.getUsername())
+        User authenticatedUser = this.userRepository.findByUsername(user.getUsername())
                 .map(UserService::isEmailVerified)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // Temporary line for testing purposes
+        authenticatedUser.setEmailVerified(true);
+        this.userRepository.save(authenticatedUser);
+
+        return authenticatedUser;
     }
 
     public HttpHeaders generateJwtHeader(String username) {

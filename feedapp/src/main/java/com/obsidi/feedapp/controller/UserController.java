@@ -6,15 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.sql.Timestamp;
+import java.time.Instant;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(exposedHeaders = "Authorization")
 public class UserController {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -22,21 +25,18 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    // Endpoint to list all users
     @GetMapping("/")
     public List<User> listUsers() {
         logger.debug("The listUsers() method was invoked!");
         return this.userService.listUsers();
     }
 
-    // Endpoint to find a user by username
     @GetMapping("/{username}")
     public Optional<User> findByUsername(@PathVariable String username) {
         logger.debug("The findByUsername() method was invoked! username={}", username);
         return this.userService.findByUsername(username);
     }
 
-    // Endpoint to create a new user
     @GetMapping("/{first}/{last}/{username}/{password}/{phone}/{emailId}")
     public String createUser(
             @PathVariable String first,
@@ -62,14 +62,12 @@ public class UserController {
         return "User Created Successfully";
     }
 
-    // Endpoint to sign up a new user
     @PostMapping("/signup")
     public User signup(@RequestBody User user) {
         logger.debug("Signing up, username: {}", user.getUsername());
         return this.userService.signup(user);
     }
 
-    // Endpoint to verify email
     @GetMapping("/verify/email")
     public ResponseEntity<String> verifyEmail() {
         logger.debug("Verifying Email");
@@ -81,5 +79,18 @@ public class UserController {
             logger.error("Email verification failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Email verification failed");
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<User> login(@RequestBody User user) {
+        logger.debug("Authenticating, username: {}, password: {}", user.getUsername(), user.getPassword());
+
+        // Authenticate the user and generate JWT
+        user = this.userService.authenticate(user);
+        HttpHeaders jwtHeader = this.userService.generateJwtHeader(user.getUsername());
+
+        logger.debug("User Authenticated, username: {}", user.getUsername());
+
+        return new ResponseEntity<>(user, jwtHeader, OK);
     }
 }
