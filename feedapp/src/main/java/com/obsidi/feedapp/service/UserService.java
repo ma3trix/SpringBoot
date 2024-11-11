@@ -1,24 +1,29 @@
 package com.obsidi.feedapp.service;
 
+import com.obsidi.feedapp.exception.EmailNotVerifiedException;
 import com.obsidi.feedapp.exception.EmailExistException;
 import com.obsidi.feedapp.exception.UserNotFoundException;
 import com.obsidi.feedapp.exception.UsernameExistException;
 import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.repository.UserRepository;
-import com.obsidi.feedapp.service.EmailService;
+import com.obsidi.feedapp.provider.ResourceProvider;
+import com.obsidi.feedapp.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-// Removed incorrect import statement
 @Service
 public class UserService {
 
@@ -31,22 +36,27 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    // Retrieves all users from the database
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JwtService jwtService;
+
+    @Autowired
+    ResourceProvider provider;
+
     public List<User> listUsers() {
         return this.userRepository.findAll();
     }
 
-    // Finds a user by their username
     public Optional<User> findByUsername(String username) {
         return this.userRepository.findByUsername(username);
     }
 
-    // Saves a new user to the database
     public void createUser(User user) {
         this.userRepository.save(user);
     }
 
-    // Method to validate username and email for duplicates
     private void validateUsernameAndEmail(String username, String emailId) {
         this.userRepository.findByUsername(username).ifPresent(u -> {
             throw new UsernameExistException(String.format("Username already exists, %s", u.getUsername()));
@@ -57,38 +67,48 @@ public class UserService {
         });
     }
 
-    // Registers a new user with duplicate checks and password encryption
     public User signup(User user) {
-        // Convert username and emailId to lowercase
         user.setUsername(user.getUsername().toLowerCase());
         user.setEmailId(user.getEmailId().toLowerCase());
-
-        // Validate username and email for uniqueness
         this.validateUsernameAndEmail(user.getUsername(), user.getEmailId());
-
-        // Set additional user properties
         user.setEmailVerified(false);
         user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         user.setCreatedOn(Timestamp.from(Instant.now()));
-
-        // Save the user to the database
         this.userRepository.save(user);
-
-        // Send verification email
         this.emailService.sendVerificationEmail(user);
-
         return user;
     }
 
     public void verifyEmail() {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
         User user = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
-
         user.setEmailVerified(true);
-
         this.userRepository.save(user);
+    }
+
+    private static User isEmailVerified(User user) {
+        if (user.getEmailVerified().equals(false)) {
+            throw new EmailNotVerifiedException(String.format("Email requires verification, %s", user.getEmailId()));
+        }
+        return user;
+    }
+
+    private Authentication authenticate(String username, String password) {
+        return this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username, password));
+    }
+
+    public User authenticate(User user) {
+        this.authenticate(user.getUsername(), user.getPassword());
+        return this.userRepository.findByUsername(user.getUsername())
+                .map(UserService::isEmailVerified)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    public HttpHeaders generateJwtHeader(String username) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(AUTHORIZATION, this.jwtService.generateJwtToken(username, this.provider.getJwtExpiration()));
+        return headers;
     }
 }
