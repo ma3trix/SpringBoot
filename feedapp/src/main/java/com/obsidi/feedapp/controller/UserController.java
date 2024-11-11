@@ -1,19 +1,17 @@
 package com.obsidi.feedapp.controller;
 
-import com.obsidi.feedapp.jdbc.UserBean;
+import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import com.obsidi.feedapp.jpa.User;
 
 @RestController
 @RequestMapping("/user")
@@ -69,5 +67,19 @@ public class UserController {
     public User signup(@RequestBody User user) {
         logger.debug("Signing up, username: {}", user.getUsername());
         return this.userService.signup(user);
+    }
+
+    // Endpoint to verify email
+    @GetMapping("/verify/email")
+    public ResponseEntity<String> verifyEmail() {
+        logger.debug("Verifying Email");
+
+        try {
+            this.userService.verifyEmail();
+            return ResponseEntity.ok("Email verified successfully");
+        } catch (Exception e) {
+            logger.error("Email verification failed: {}", e.getMessage());
+            return ResponseEntity.badRequest().body("Email verification failed");
+        }
     }
 }
