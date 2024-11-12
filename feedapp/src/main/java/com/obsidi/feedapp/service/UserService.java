@@ -30,6 +30,8 @@ import java.util.function.Supplier;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.slf4j.Logger;
 
+import com.obsidi.feedapp.jpa.Profile;
+
 @Service
 public class UserService {
 
@@ -180,5 +182,34 @@ public class UserService {
     private Authentication authenticate(String username, String password) {
         return this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
+    }
+
+    private User updateUserProfile(Profile profile, User user) {
+
+        Profile currentProfile = user.getProfile();
+
+        if (Optional.ofNullable(currentProfile).isPresent()) {
+
+            this.updateValue(profile::getHeadline, currentProfile::setHeadline);
+            this.updateValue(profile::getBio, currentProfile::setBio);
+            this.updateValue(profile::getCity, currentProfile::setCity);
+            this.updateValue(profile::getCountry, currentProfile::setCountry);
+            this.updateValue(profile::getPicture, currentProfile::setPicture);
+        } else {
+            user.setProfile(profile);
+            profile.setUser(user);
+        }
+
+        return this.userRepository.save(user);
+    }
+
+    public User updateUserProfile(Profile profile) {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        /* Get and Update User */
+        return this.userRepository.findByUsername(username)
+                .map(user -> this.updateUserProfile(profile, user))
+                .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
     }
 }

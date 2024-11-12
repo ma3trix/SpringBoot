@@ -1,43 +1,29 @@
 package com.obsidi.feedapp.jpa;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.CascadeType;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import jakarta.persistence.*;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
 @Table(name = "\"User\"")
 public class User implements Serializable {
-
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "\"userId\"")
     private Integer userId;
-
     @Column(name = "\"firstName\"")
     private String firstName;
 
     @Column(name = "\"lastName\"")
     private String lastName;
 
-    @Column(unique = true)
     private String username;
 
     @JsonProperty(access = Access.WRITE_ONLY)
@@ -45,7 +31,7 @@ public class User implements Serializable {
 
     private String phone;
 
-    @Column(name = "\"emailId\"", unique = true)
+    @Column(name = "\"emailId\"")
     private String emailId;
 
     @Column(name = "\"emailVerified\"")
@@ -54,7 +40,7 @@ public class User implements Serializable {
     @Column(name = "\"createdOn\"")
     private Timestamp createdOn;
 
-    @JsonInclude(Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Profile profile;
 
@@ -66,11 +52,8 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user")
     private List<FeedMetaData> feedMetaData;
 
-    // No-arg constructor
     public User() {
     }
-
-    // Getters and Setters
 
     public Integer getUserId() {
         return userId;
@@ -144,7 +127,30 @@ public class User implements Serializable {
         this.createdOn = createdOn;
     }
 
-    // toString method
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    public List<Feed> getFeeds() {
+        return feeds;
+    }
+
+    public void setFeeds(List<Feed> feeds) {
+        this.feeds = feeds;
+    }
+
+    public List<FeedMetaData> getFeedMetaData() {
+        return feedMetaData;
+    }
+
+    public void setFeedMetaData(List<FeedMetaData> feedMetaData) {
+        this.feedMetaData = feedMetaData;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -152,6 +158,7 @@ public class User implements Serializable {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
                 ", phone='" + phone + '\'' +
                 ", emailId='" + emailId + '\'' +
                 ", emailVerified=" + emailVerified +
