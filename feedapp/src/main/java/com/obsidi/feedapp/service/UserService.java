@@ -26,7 +26,6 @@ import java.util.Optional;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class UserService {
@@ -106,9 +105,7 @@ public class UserService {
     }
 
     public void sendResetPasswordEmail(String emailId) {
-
         Optional<User> opt = this.userRepository.findByEmailId(emailId);
-
         if (opt.isPresent()) {
             this.emailService.sendResetPasswordEmail(opt.get());
         } else {
@@ -117,14 +114,10 @@ public class UserService {
     }
 
     public void resetPassword(String password) {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
         User user = this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
-
         user.setPassword(this.passwordEncoder.encode(password));
-
         this.userRepository.save(user);
     }
 
@@ -134,18 +127,11 @@ public class UserService {
                 .map(UserService::isEmailVerified)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        // Temporary line for testing purposes
-        authenticatedUser.setEmailVerified(true);
-        this.userRepository.save(authenticatedUser);
-
         return authenticatedUser;
     }
 
     public User getUser() {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        /* Get User from the DB. */
         return this.userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
     }
@@ -155,4 +141,5 @@ public class UserService {
         headers.add(AUTHORIZATION, this.jwtService.generateJwtToken(username, this.provider.getJwtExpiration()));
         return headers;
     }
+
 }

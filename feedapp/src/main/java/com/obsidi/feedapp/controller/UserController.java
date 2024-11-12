@@ -9,10 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 import java.util.Optional;
-import java.sql.Timestamp;
-import java.time.Instant;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -38,29 +37,11 @@ public class UserController {
         return this.userService.findByUsername(username);
     }
 
-    @GetMapping("/{first}/{last}/{username}/{password}/{phone}/{emailId}")
-    public String createUser(
-            @PathVariable String first,
-            @PathVariable String last,
-            @PathVariable String username,
-            @PathVariable String password,
-            @PathVariable String phone,
-            @PathVariable String emailId) {
-
-        User user = new User();
-        user.setFirstName(first);
-        user.setLastName(last);
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setPhone(phone);
-        user.setEmailId(emailId);
-        user.setEmailVerified(false);
-        user.setCreatedOn(Timestamp.from(Instant.now()));
-
-        logger.debug("The createUser() method was invoked! user={}", user);
+    @PostMapping("/create")
+    public ResponseEntity<String> createUser(@RequestBody User user) {
+        logger.debug("The createUser() method was invoked!");
         this.userService.createUser(user);
-
-        return "User Created Successfully";
+        return ResponseEntity.ok("User Created Successfully");
     }
 
     @PostMapping("/signup")
@@ -83,16 +64,16 @@ public class UserController {
     }
 
     @PostMapping("/reset")
-    public void passwordReset(@RequestBody JsonNode json) {
-
-        logger.debug("Resetting Password, password: {}", json.get("password").asText());
+    public ResponseEntity<String> passwordReset(@RequestBody JsonNode json) {
+        logger.debug("Resetting Password");
 
         this.userService.resetPassword(json.get("password").asText());
+        return ResponseEntity.ok("Password reset successful");
     }
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) {
-        logger.debug("Authenticating, username: {}, password: {}", user.getUsername(), user.getPassword());
+        logger.debug("Authenticating, username: {}", user.getUsername());
 
         // Authenticate the user and generate JWT
         user = this.userService.authenticate(user);
@@ -101,5 +82,17 @@ public class UserController {
         logger.debug("User Authenticated, username: {}", user.getUsername());
 
         return new ResponseEntity<>(user, jwtHeader, OK);
+    }
+
+    @GetMapping("/get")
+    public User getUser() {
+        logger.debug("Getting User Data");
+        return this.userService.getUser();
+    }
+
+    @GetMapping("/reset/{emailId}")
+    public void sendResetPasswordEmail(@PathVariable String emailId) {
+        logger.debug("Sending Reset Password Email, emailId: {}", emailId);
+        this.userService.sendResetPasswordEmail(emailId);
     }
 }
