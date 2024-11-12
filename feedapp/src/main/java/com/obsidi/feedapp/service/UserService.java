@@ -141,6 +141,15 @@ public class UserService {
         return authenticatedUser;
     }
 
+    public User getUser() {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        /* Get User from the DB. */
+        return this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+    }
+
     public HttpHeaders generateJwtHeader(String username) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, this.jwtService.generateJwtToken(username, this.provider.getJwtExpiration()));
