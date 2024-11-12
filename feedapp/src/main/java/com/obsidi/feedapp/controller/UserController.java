@@ -1,5 +1,6 @@
 package com.obsidi.feedapp.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,14 @@ public class UserController {
             logger.error("Email verification failed: {}", e.getMessage());
             return ResponseEntity.badRequest().body("Email verification failed");
         }
+    }
+
+    @PostMapping("/reset")
+    public void passwordReset(@RequestBody JsonNode json) {
+
+        logger.debug("Resetting Password, password: {}", json.get("password").asText());
+
+        this.userService.resetPassword(json.get("password").asText());
     }
 
     @PostMapping("/login")

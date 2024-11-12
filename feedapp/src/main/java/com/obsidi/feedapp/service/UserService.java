@@ -8,6 +8,8 @@ import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.repository.UserRepository;
 import com.obsidi.feedapp.provider.ResourceProvider;
 import com.obsidi.feedapp.security.JwtService;
+
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,9 +25,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class UserService {
+
+    final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     UserRepository userRepository;
@@ -97,6 +103,29 @@ public class UserService {
     private Authentication authenticate(String username, String password) {
         return this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
+    }
+
+    public void sendResetPasswordEmail(String emailId) {
+
+        Optional<User> opt = this.userRepository.findByEmailId(emailId);
+
+        if (opt.isPresent()) {
+            this.emailService.sendResetPasswordEmail(opt.get());
+        } else {
+            logger.debug("Email doesn't exist, {}", emailId);
+        }
+    }
+
+    public void resetPassword(String password) {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+
+        user.setPassword(this.passwordEncoder.encode(password));
+
+        this.userRepository.save(user);
     }
 
     public User authenticate(User user) {
