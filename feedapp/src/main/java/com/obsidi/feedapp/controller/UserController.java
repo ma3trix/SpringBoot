@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.OK;
+import com.obsidi.feedapp.jpa.Profile;
 
 @RestController
 @RequestMapping("/user")
@@ -102,5 +103,13 @@ public class UserController {
         logger.debug("Updating User Data");
 
         return this.userService.updateUser(user);
+    }
+
+    @PostMapping("/update/profile")
+    public User updateUserProfile(@RequestBody Profile profile) {
+
+        logger.debug("Updating User Profile Data, Profile: {}", profile.toString());
+
+        return this.userService.updateUserProfile(profile);
     }
 }

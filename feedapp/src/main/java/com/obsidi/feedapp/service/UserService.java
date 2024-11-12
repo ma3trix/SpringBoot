@@ -31,6 +31,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.slf4j.Logger;
 
 import com.obsidi.feedapp.jpa.Profile;
+import com.obsidi.feedapp.jpa.Profile;
 
 @Service
 public class UserService {
@@ -212,4 +213,5 @@ public class UserService {
                 .map(user -> this.updateUserProfile(profile, user))
                 .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
     }
+
 }
