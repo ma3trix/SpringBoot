@@ -95,4 +95,12 @@ public class UserController {
         logger.debug("Sending Reset Password Email, emailId: {}", emailId);
         this.userService.sendResetPasswordEmail(emailId);
     }
+
+    @PostMapping("/update")
+    public User updateUser(@RequestBody User user) {
+
+        logger.debug("Updating User Data");
+
+        return this.userService.updateUser(user);
+    }
 }
