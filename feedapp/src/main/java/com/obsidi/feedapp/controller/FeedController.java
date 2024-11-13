@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.obsidi.feedapp.service.FeedService;
 import com.obsidi.feedapp.jpa.Feed;
+// import com.obsidi.feedapp.exception.domain.FeedNotFoundException; // Ensure this class exists in the specified package or update the package name if necessary.
 
 @CrossOrigin
 @RestController
@@ -25,5 +28,11 @@ public class FeedController {
     public Feed createFeed(@RequestBody Feed feed) {
         logger.debug("Creating Feed");
         return this.feedService.createFeed(feed);
+    }
+
+    @GetMapping("/{feedId}")
+    public Feed getFeed(@PathVariable int feedId) {
+        logger.debug("Fetching Feed with ID: {}", feedId);
+        return feedService.getFeedById(feedId);
     }
 }
