@@ -9,9 +9,11 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import com.obsidi.feedapp.repository.FeedRepository;
 import com.obsidi.feedapp.repository.UserRepository;
+import com.obsidi.feedapp.exception.FeedNotFoundException;
 import com.obsidi.feedapp.exception.UserNotFoundException;
 import com.obsidi.feedapp.jpa.Feed;
 import com.obsidi.feedapp.jpa.User;
+import java.util.Optional;
 
 @Service
 public class FeedService {
@@ -34,5 +36,10 @@ public class FeedService {
         feed.setCreatedOn(Timestamp.from(Instant.now()));
 
         return this.feedRepository.save(feed);
+    }
+
+    public Feed getFeedById(int feedId) {
+        return this.feedRepository.findById(feedId)
+                .orElseThrow(() -> new FeedNotFoundException(String.format("Feed doesn't exist, %d", feedId)));
     }
 }
