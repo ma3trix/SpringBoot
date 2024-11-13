@@ -13,7 +13,10 @@ import com.obsidi.feedapp.exception.FeedNotFoundException;
 import com.obsidi.feedapp.exception.UserNotFoundException;
 import com.obsidi.feedapp.jpa.Feed;
 import com.obsidi.feedapp.jpa.User;
-import java.util.Optional;
+import com.obsidi.feedapp.domain.PageResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class FeedService {
@@ -41,5 +44,17 @@ public class FeedService {
     public Feed getFeedById(int feedId) {
         return this.feedRepository.findById(feedId)
                 .orElseThrow(() -> new FeedNotFoundException(String.format("Feed doesn't exist, %d", feedId)));
+    }
+
+    public PageResponse<Feed> getUserFeeds(int pageNum, int pageSize) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+
+        Page<Feed> paged = this.feedRepository.findByUser(user,
+                PageRequest.of(pageNum, pageSize, Sort.by("feedId").descending()));
+
+        return new PageResponse<>(paged);
     }
 }
