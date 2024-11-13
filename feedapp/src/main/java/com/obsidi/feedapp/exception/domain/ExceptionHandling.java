@@ -23,15 +23,6 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.obsidi.feedapp.exception.EmailExistException;
-import com.obsidi.feedapp.exception.UsernameExistException;
-import com.obsidi.feedapp.exception.LikeExistException;
-import com.obsidi.feedapp.exception.EmailNotFoundException;
-import com.obsidi.feedapp.exception.EmailNotVerifiedException;
-import com.obsidi.feedapp.exception.UserNotFoundException;
-import com.obsidi.feedapp.exception.FeedNotFoundException;
-import com.obsidi.feedapp.exception.FeedNotUserException;
-
 @RestController
 @RestControllerAdvice
 public class ExceptionHandling implements ErrorController {

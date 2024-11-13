@@ -32,6 +32,7 @@ public class FeedMetaData implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "\"actionUserId\"")
+
     private User user;
 
     // No-arg constructor

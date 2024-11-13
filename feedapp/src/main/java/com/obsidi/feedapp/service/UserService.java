@@ -1,9 +1,5 @@
 package com.obsidi.feedapp.service;
 
-import com.obsidi.feedapp.exception.EmailNotVerifiedException;
-import com.obsidi.feedapp.exception.EmailExistException;
-import com.obsidi.feedapp.exception.UserNotFoundException;
-import com.obsidi.feedapp.exception.UsernameExistException;
 import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.repository.UserRepository;
 import com.obsidi.feedapp.provider.ResourceProvider;
@@ -30,6 +26,10 @@ import java.util.function.Supplier;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.slf4j.Logger;
 
+import com.obsidi.feedapp.exception.EmailExistException;
+import com.obsidi.feedapp.exception.EmailNotVerifiedException;
+import com.obsidi.feedapp.exception.UserNotFoundException;
+import com.obsidi.feedapp.exception.UsernameExistException;
 import com.obsidi.feedapp.jpa.Profile;
 import com.obsidi.feedapp.jpa.Profile;
 
