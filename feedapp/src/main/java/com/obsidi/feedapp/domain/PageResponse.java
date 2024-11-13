@@ -9,13 +9,20 @@ public class PageResponse<T> {
     private int pageNum;
     private int pageSize;
     private int totalPages;
+    private long totalElements;
     private List<T> content;
 
+    /**
+     * Constructor that initializes PageResponse based on a Page object.
+     *
+     * @param paged Page object containing pagination information and content.
+     */
     public PageResponse(Page<T> paged) {
         if (Optional.ofNullable(paged).isPresent()) {
             this.pageNum = paged.getNumber();
             this.pageSize = paged.getSize();
             this.totalPages = paged.getTotalPages();
+            this.totalElements = paged.getTotalElements();
             this.content = paged.getContent();
         }
     }
@@ -42,6 +49,14 @@ public class PageResponse<T> {
 
     public void setTotalPages(int totalPages) {
         this.totalPages = totalPages;
+    }
+
+    public long getTotalElements() {
+        return totalElements;
+    }
+
+    public void setTotalElements(long totalElements) {
+        this.totalElements = totalElements;
     }
 
     public List<T> getContent() {

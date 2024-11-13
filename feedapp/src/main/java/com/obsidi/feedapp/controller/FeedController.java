@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.obsidi.feedapp.service.FeedService;
 import com.obsidi.feedapp.jpa.Feed;
-// import com.obsidi.feedapp.exception.domain.FeedNotFoundException; // Ensure this class exists in the specified package or update the package name if necessary.
+import com.obsidi.feedapp.domain.PageResponse;
 
 @CrossOrigin
 @RestController
@@ -34,5 +34,11 @@ public class FeedController {
     public Feed getFeed(@PathVariable int feedId) {
         logger.debug("Fetching Feed with ID: {}", feedId);
         return feedService.getFeedById(feedId);
+    }
+
+    @GetMapping("/user/{pageNum}/{pageSize}")
+    public PageResponse<Feed> getUserFeeds(@PathVariable int pageNum, @PathVariable int pageSize) {
+        logger.debug("Getting User Feeds List, pageNum: {}, pageSize: {}", pageNum, pageSize);
+        return this.feedService.getUserFeeds(pageNum, pageSize);
     }
 }
