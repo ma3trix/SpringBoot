@@ -41,4 +41,10 @@ public class FeedController {
         logger.debug("Getting User Feeds List, pageNum: {}, pageSize: {}", pageNum, pageSize);
         return this.feedService.getUserFeeds(pageNum, pageSize);
     }
+
+    @GetMapping("/other-users/{pageNum}/{pageSize}")
+    public PageResponse<Feed> getOtherUsersFeeds(@PathVariable int pageNum, @PathVariable int pageSize) {
+        logger.debug("Getting Feeds from Other Users, pageNum: {}, pageSize: {}", pageNum, pageSize);
+        return this.feedService.getOtherUsersFeeds(pageNum, pageSize);
+    }
 }

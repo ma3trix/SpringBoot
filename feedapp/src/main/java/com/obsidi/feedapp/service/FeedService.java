@@ -57,4 +57,18 @@ public class FeedService {
 
         return new PageResponse<>(paged);
     }
+
+    public PageResponse<Feed> getOtherUsersFeeds(int pageNum, int pageSize) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Find the currently authenticated user
+        User user = this.userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+
+        // Retrieve feeds from other users
+        Page<Feed> paged = this.feedRepository.findByUserNot(user,
+                PageRequest.of(pageNum, pageSize, Sort.by("feedId").descending()));
+
+        return new PageResponse<>(paged);
+    }
 }
