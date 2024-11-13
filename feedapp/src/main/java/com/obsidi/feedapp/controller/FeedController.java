@@ -2,6 +2,7 @@ package com.obsidi.feedapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +47,13 @@ public class FeedController {
     public PageResponse<Feed> getOtherUsersFeeds(@PathVariable int pageNum, @PathVariable int pageSize) {
         logger.debug("Getting Feeds from Other Users, pageNum: {}, pageSize: {}", pageNum, pageSize);
         return this.feedService.getOtherUsersFeeds(pageNum, pageSize);
+    }
+
+    @DeleteMapping("/{feedId}")
+    public void deleteFeed(@PathVariable int feedId) {
+
+        logger.debug("Deleting Feed, feedId: {}", feedId);
+
+        this.feedService.deleteFeed(feedId);
     }
 }

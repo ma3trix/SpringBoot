@@ -1,4 +1,4 @@
-package com.obsidi.feedapp.exception;
+package com.obsidi.feedapp.exception.domain;
 
 public class FeedNotFoundException extends RuntimeException {
 

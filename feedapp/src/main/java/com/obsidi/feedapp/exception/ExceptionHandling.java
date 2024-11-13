@@ -1,4 +1,4 @@
-package com.obsidi.feedapp.exception.domain;
+package com.obsidi.feedapp.exception;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.RestController;

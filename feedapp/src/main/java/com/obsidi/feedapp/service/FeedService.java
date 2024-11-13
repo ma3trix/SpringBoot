@@ -14,15 +14,15 @@ import com.obsidi.feedapp.jpa.Feed;
 import com.obsidi.feedapp.jpa.FeedMetaData;
 import com.obsidi.feedapp.jpa.User;
 import com.obsidi.feedapp.domain.PageResponse;
-import com.obsidi.feedapp.exception.FeedNotFoundException;
-import com.obsidi.feedapp.exception.LikeExistException;
-import com.obsidi.feedapp.exception.UserNotFoundException;
+import com.obsidi.feedapp.exception.domain.FeedNotFoundException;
+import com.obsidi.feedapp.exception.domain.FeedNotUserException;
+import com.obsidi.feedapp.exception.domain.LikeExistException;
+import com.obsidi.feedapp.exception.domain.UserNotFoundException;
 
 import org.springframework.data.domain.Page;
 import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import com.obsidi.feedapp.exception.FeedNotUserException;
 
 @Service
 public class FeedService {

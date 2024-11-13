@@ -26,10 +26,10 @@ import java.util.function.Supplier;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import org.slf4j.Logger;
 
-import com.obsidi.feedapp.exception.EmailExistException;
-import com.obsidi.feedapp.exception.EmailNotVerifiedException;
-import com.obsidi.feedapp.exception.UserNotFoundException;
-import com.obsidi.feedapp.exception.UsernameExistException;
+import com.obsidi.feedapp.exception.domain.EmailExistException;
+import com.obsidi.feedapp.exception.domain.EmailNotVerifiedException;
+import com.obsidi.feedapp.exception.domain.UserNotFoundException;
+import com.obsidi.feedapp.exception.domain.UsernameExistException;
 import com.obsidi.feedapp.jpa.Profile;
 import com.obsidi.feedapp.jpa.Profile;
 
