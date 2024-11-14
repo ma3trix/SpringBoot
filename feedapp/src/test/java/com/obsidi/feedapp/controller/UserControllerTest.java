@@ -15,7 +15,9 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,11 +31,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+// @ActiveProfiles("test")
+// @SpringBootTest // Using @SpringBootTest for full application context
+// @AutoConfigureMockMvc
+// @TestInstance(Lifecycle.PER_CLASS)
+// @TestMethodOrder(OrderAnnotation.class)
 
 @ActiveProfiles("test")
-@SpringBootTest
+@WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
-@TestInstance(Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 public class UserControllerTest {
 
@@ -52,9 +61,9 @@ public class UserControllerTest {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    User user;
-    String otherUsername;
-    String otherPassword;
+    private User user;
+    private String otherUsername;
+    private String otherPassword;
 
     @BeforeEach
     public void setup() {
@@ -75,7 +84,6 @@ public class UserControllerTest {
     public void signupIntegrationTest() throws Exception {
         ObjectMapper objectMapper = JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
 
-        // Check the Rest End Point Response
         this.mockMvc.perform(MockMvcRequestBuilders.post("/user/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(user)))
@@ -86,7 +94,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.phone", is(this.user.getPhone())))
                 .andExpect(jsonPath("$.emailId", is(this.user.getEmailId())));
 
-        // Check the DB
         Optional<User> opt = this.userRepository.findByUsername(this.user.getUsername());
 
         assertTrue(opt.isPresent(), "User Should Exist");
@@ -103,7 +110,6 @@ public class UserControllerTest {
     public void signupUsernameExistsIntegrationTest() throws Exception {
         ObjectMapper objectMapper = JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
 
-        // Check the Rest End Point Response
         this.mockMvc.perform(MockMvcRequestBuilders.post("/user/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(this.user)))
@@ -120,9 +126,8 @@ public class UserControllerTest {
     public void signupEmailExistsIntegrationTest() throws Exception {
         ObjectMapper objectMapper = JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
 
-        this.user.setUsername(this.otherUsername); // Set different username to test email uniqueness
+        this.user.setUsername(this.otherUsername);
 
-        // Check the Rest End Point Response
         this.mockMvc.perform(MockMvcRequestBuilders.post("/user/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(this.user)))
@@ -133,4 +138,42 @@ public class UserControllerTest {
                 .andExpect(
                         jsonPath("$.message", is(String.format("Email already exists, %s", this.user.getEmailId()))));
     }
+
+    @Test
+    @Order(4)
+    public void verifyEmailIntegrationTest() throws Exception {
+        Optional<User> opt = this.userRepository.findByUsername(this.user.getUsername());
+        assertTrue(opt.isPresent(), "User Should Exist");
+
+        assertEquals(false, opt.get().getEmailVerified());
+
+        String jwt = String.format("Bearer %s", this.jwtService.generateJwtToken(this.user.getUsername(), 10_000));
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/user/verify/email")
+                .header(AUTHORIZATION, jwt))
+                .andExpect(status().isOk());
+
+        opt = this.userRepository.findByUsername(this.user.getUsername());
+        assertTrue(opt.isPresent(), "User Should Exist");
+
+        assertEquals(true, opt.get().getEmailVerified());
+    }
+
+    @Test
+    @Order(5)
+    public void verifyEmailUsernameNotFoundIntegrationTest() throws Exception {
+        Optional<User> opt = this.userRepository.findByUsername(this.otherUsername);
+        assertTrue(opt.isEmpty(), "User Should Not Exist");
+
+        String jwt = String.format("Bearer %s", this.jwtService.generateJwtToken(this.otherUsername, 10_000));
+
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/user/verify/email")
+                .header(AUTHORIZATION, jwt))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.httpStatusCode", is(400)))
+                .andExpect(jsonPath("$.httpStatus", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.reason", is("BAD REQUEST")))
+                .andExpect(jsonPath("$.message", is(String.format("Username doesn't exist, %s", this.otherUsername))));
+    }
+
 }
