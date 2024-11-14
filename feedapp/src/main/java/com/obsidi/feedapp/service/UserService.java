@@ -31,7 +31,6 @@ import com.obsidi.feedapp.exception.domain.EmailNotVerifiedException;
 import com.obsidi.feedapp.exception.domain.UserNotFoundException;
 import com.obsidi.feedapp.exception.domain.UsernameExistException;
 import com.obsidi.feedapp.jpa.Profile;
-import com.obsidi.feedapp.jpa.Profile;
 
 @Service
 public class UserService {
@@ -153,12 +152,10 @@ public class UserService {
     }
 
     public User authenticate(User user) {
+        /* Spring Security Authentication. */
         this.authenticate(user.getUsername(), user.getPassword());
-        User authenticatedUser = this.userRepository.findByUsername(user.getUsername())
-                .map(UserService::isEmailVerified)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        return authenticatedUser;
+        /* Get User from the DB. */
+        return this.userRepository.findByUsername(user.getUsername()).map(UserService::isEmailVerified).get();
     }
 
     public User getUser() {
@@ -170,6 +167,9 @@ public class UserService {
     public HttpHeaders generateJwtHeader(String username) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, this.jwtService.generateJwtToken(username, this.provider.getJwtExpiration()));
+
+        logger.debug("Generated JWT Header: {}", headers.toString());
+
         return headers;
     }
 

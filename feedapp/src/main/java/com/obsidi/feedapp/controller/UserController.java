@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +19,9 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.OK;
 import com.obsidi.feedapp.jpa.Profile;
 
+@CrossOrigin(exposedHeaders = "Authorization")
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(exposedHeaders = "Authorization")
 public class UserController {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -74,13 +77,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody User user) {
-        logger.debug("Authenticating, username: {}", user.getUsername());
+        logger.debug("Authenticating, username: {}, password: {}", user.getUsername(), user.getPassword());
 
         // Authenticate the user and generate JWT
         user = this.userService.authenticate(user);
         HttpHeaders jwtHeader = this.userService.generateJwtHeader(user.getUsername());
 
         logger.debug("User Authenticated, username: {}", user.getUsername());
+        logger.debug("Jwtheader: {}", jwtHeader.toString());
 
         return new ResponseEntity<>(user, jwtHeader, OK);
     }
@@ -111,5 +115,15 @@ public class UserController {
         logger.debug("Updating User Profile Data, Profile: {}", profile.toString());
 
         return this.userService.updateUserProfile(profile);
+    }
+
+    @GetMapping("/auth-check")
+    public ResponseEntity<String> authCheck() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            return ResponseEntity.ok("Authenticated user: " + auth.getName());
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated");
+        }
     }
 }

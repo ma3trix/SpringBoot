@@ -17,7 +17,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
 
     @Autowired
     @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver resolver;
+    HandlerExceptionResolver resolver;
 
     @Override
     public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException ex)
