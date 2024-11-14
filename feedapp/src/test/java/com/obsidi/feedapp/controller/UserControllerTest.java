@@ -15,9 +15,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,16 +31,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-// @ActiveProfiles("test")
-// @SpringBootTest // Using @SpringBootTest for full application context
-// @AutoConfigureMockMvc
-// @TestInstance(Lifecycle.PER_CLASS)
-// @TestMethodOrder(OrderAnnotation.class)
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 @ActiveProfiles("test")
-@WebMvcTest(UserController.class)
+@SpringBootTest // Using @SpringBootTest for full application context
 @AutoConfigureMockMvc
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(Lifecycle.PER_CLASS)
 @TestMethodOrder(OrderAnnotation.class)
 public class UserControllerTest {
 
@@ -174,6 +169,66 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.httpStatus", is("BAD_REQUEST")))
                 .andExpect(jsonPath("$.reason", is("BAD REQUEST")))
                 .andExpect(jsonPath("$.message", is(String.format("Username doesn't exist, %s", this.otherUsername))));
+    }
+
+    @Test
+    @Order(6)
+    public void loginIntegrationTest() throws Exception {
+
+        // Create JSON object with user credentials
+        ObjectNode root = this.objectMapper.createObjectNode();
+        root.put("username", this.user.getUsername());
+        root.put("password", this.user.getPassword());
+
+        // Send POST request to /user/login and check response
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(root)))
+                .andExpect(header().exists(AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName", is(this.user.getFirstName())))
+                .andExpect(jsonPath("$.lastName", is(this.user.getLastName())))
+                .andExpect(jsonPath("$.username", is(this.user.getUsername())))
+                .andExpect(jsonPath("$.phone", is(this.user.getPhone())))
+                .andExpect(jsonPath("$.emailId", is(this.user.getEmailId())))
+                .andExpect(jsonPath("$.emailVerified", is(true)));
+    }
+
+    @Test
+    @Order(7)
+    public void loginEmailNotVerifiedIntegrationTest() throws Exception {
+
+        // Create JSON object with user credentials
+        ObjectNode root = this.objectMapper.createObjectNode();
+        root.put("username", this.user.getUsername());
+        root.put("password", this.user.getPassword());
+
+        // Check if user exists in the repository and set emailVerified to false
+        Optional<User> opt = this.userRepository.findByUsername(this.user.getUsername());
+        assertTrue(opt.isPresent(), "User Should Exist");
+        opt.ifPresent(u -> {
+            u.setEmailVerified(false);
+            this.userRepository.save(u);
+        });
+
+        // Send POST request to /user/login and check for email verification error
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/user/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(this.objectMapper.writeValueAsString(root)))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.httpStatusCode", is(400)))
+                .andExpect(jsonPath("$.httpStatus", is("BAD_REQUEST")))
+                .andExpect(jsonPath("$.reason", is("BAD REQUEST")))
+                .andExpect(jsonPath("$.message",
+                        is(String.format("Email requires verification, %s", this.user.getEmailId()))));
+
+        // Reset emailVerified to true for future tests
+        opt = this.userRepository.findByUsername(this.user.getUsername());
+        assertTrue(opt.isPresent(), "User Should Exist");
+        opt.ifPresent(u -> {
+            u.setEmailVerified(true);
+            this.userRepository.save(u);
+        });
     }
 
 }
