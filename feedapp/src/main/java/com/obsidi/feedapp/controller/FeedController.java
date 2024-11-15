@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.obsidi.feedapp.service.FeedService;
 import com.obsidi.feedapp.jpa.Feed;
-import com.obsidi.feedapp.domain.PageResponse;
+import com.obsidi.feedapp.exception.domain.PageResponse;
 
 @CrossOrigin
 @RestController

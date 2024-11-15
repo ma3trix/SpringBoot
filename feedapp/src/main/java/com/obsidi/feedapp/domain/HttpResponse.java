@@ -6,11 +6,11 @@ import java.text.SimpleDateFormat;
 
 public class HttpResponse {
 
-    private Date timeStamp;
-    private int httpStatusCode; // 200, 201, 400, 500
-    private HttpStatus httpStatus;
-    private String reason;
-    private String message;
+    Date timeStamp;
+    int httpStatusCode; // 200, 201, 400, 500
+    HttpStatus httpStatus;
+    String reason;
+    String message;
 
     // Constructor
     public HttpResponse(int httpStatusCode, HttpStatus httpStatus, String reason, String message) {

@@ -55,16 +55,9 @@ public class UserController {
     }
 
     @GetMapping("/verify/email")
-    public ResponseEntity<String> verifyEmail() {
+    public void verifyEmail() {
         logger.debug("Verifying Email");
-
-        try {
-            this.userService.verifyEmail();
-            return ResponseEntity.ok("Email verified successfully");
-        } catch (Exception e) {
-            logger.error("Email verification failed: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Email verification failed");
-        }
+        this.userService.verifyEmail();
     }
 
     @PostMapping("/reset")
