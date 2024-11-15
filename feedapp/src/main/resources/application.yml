@@ -24,6 +24,20 @@ spring:
     time-zone: America/Toronto
     date-format: "yyyy-MM-dd HH:mm:ss"
 
+    # Email Settings
+  mail:
+    username: malikintended@gmail.com
+    password: zqmrhhsfpfboyqwl
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   # Common Database Settings
   sql:
     init:
@@ -63,20 +77,6 @@ spring:
   jackson:
     time-zone: America/Toronto
     date-format: "yyyy-MM-dd HH:mm:ss"
-
-  # Email Settings
-  mail:
-    username: malikintended@gmail.com
-    password: zqmrhhsfpfboyqwl
-    host: smtp.gmail.com
-    port: 587
-    protocol: smtp
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
 ---
 # Prod Profile

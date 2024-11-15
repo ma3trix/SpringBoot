@@ -22,6 +22,14 @@ import static org.springframework.http.HttpStatus.*;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.obsidi.feedapp.exception.domain.EmailExistException;
+import com.obsidi.feedapp.exception.domain.UsernameExistException;
+import com.obsidi.feedapp.exception.domain.LikeExistException;
+import com.obsidi.feedapp.exception.domain.EmailNotFoundException;
+import com.obsidi.feedapp.exception.domain.EmailNotVerifiedException;
+import com.obsidi.feedapp.exception.domain.UserNotFoundException;
+import com.obsidi.feedapp.exception.domain.FeedNotFoundException;
+import com.obsidi.feedapp.exception.domain.FeedNotUserException;
 
 @RestController
 @RestControllerAdvice
@@ -51,108 +59,100 @@ public class ExceptionHandling implements ErrorController {
 
     @ExceptionHandler(JWTDecodeException.class)
     public ResponseEntity<HttpResponse> tokenDecodeException() {
-        return this.createHttpResponse(HttpStatus.BAD_REQUEST, TOKEN_DECODE_ERROR);
+        return this.createHttpResponse(BAD_REQUEST, TOKEN_DECODE_ERROR);
     }
 
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<HttpResponse> accountDisabledException() {
-        return this.createHttpResponse(HttpStatus.BAD_REQUEST, ACCOUNT_DISABLED);
+        return this.createHttpResponse(BAD_REQUEST, ACCOUNT_DISABLED);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<HttpResponse> badCredentialsException() {
-        return this.createHttpResponse(HttpStatus.BAD_REQUEST, INCORRECT_CREDENTIALS);
+        return this.createHttpResponse(BAD_REQUEST, INCORRECT_CREDENTIALS);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<HttpResponse> accessDeniedException() {
-        return this.createHttpResponse(HttpStatus.FORBIDDEN, NOT_ENOUGH_PERMISSION);
+        return this.createHttpResponse(FORBIDDEN, NOT_ENOUGH_PERMISSION);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<HttpResponse> authenticationException() {
-        return this.createHttpResponse(HttpStatus.FORBIDDEN, NOT_AUTHENTICATED);
+        return this.createHttpResponse(FORBIDDEN, NOT_AUTHENTICATED);
     }
 
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<HttpResponse> lockedException() {
-        return this.createHttpResponse(HttpStatus.UNAUTHORIZED, ACCOUNT_LOCKED);
+        return this.createHttpResponse(UNAUTHORIZED, ACCOUNT_LOCKED);
     }
 
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<HttpResponse> tokenExpiredException(TokenExpiredException ex) {
-        return this.createHttpResponse(HttpStatus.UNAUTHORIZED, TOKEN_EXPIRED_ERROR);
+        return this.createHttpResponse(UNAUTHORIZED, TOKEN_EXPIRED_ERROR);
     }
 
-    // @ExceptionHandler(EmailExistException.class)
-    // public ResponseEntity<HttpResponse> emailExistException(EmailExistException
-    // ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(EmailExistException.class)
+    public ResponseEntity<HttpResponse> emailExistException(EmailExistException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(UsernameExistException.class)
-    // public ResponseEntity<HttpResponse>
-    // usernameExistException(UsernameExistException ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(UsernameExistException.class)
+    public ResponseEntity<HttpResponse> usernameExistException(UsernameExistException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(LikeExistException.class)
-    // public ResponseEntity<HttpResponse> likeExistException(LikeExistException ex)
-    // {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(LikeExistException.class)
+    public ResponseEntity<HttpResponse> likeExistException(LikeExistException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(EmailNotFoundException.class)
-    // public ResponseEntity<HttpResponse>
-    // emailNotFoundException(EmailNotFoundException ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<HttpResponse> emailNotFoundException(EmailNotFoundException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(EmailNotVerifiedException.class)
-    // public ResponseEntity<HttpResponse>
-    // emailNotVerifiedException(EmailNotVerifiedException ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<HttpResponse> emailNotVerifiedException(EmailNotVerifiedException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(UserNotFoundException.class)
-    // public ResponseEntity<HttpResponse>
-    // userNotFoundException(UserNotFoundException ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(FeedNotFoundException.class)
-    // public ResponseEntity<HttpResponse>
-    // feedNotFoundException(FeedNotFoundException ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(FeedNotFoundException.class)
+    public ResponseEntity<HttpResponse> feedNotFoundException(FeedNotFoundException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
-    // @ExceptionHandler(FeedNotUserException.class)
-    // public ResponseEntity<HttpResponse> feedNotUserException(FeedNotUserException
-    // ex) {
-    // return this.createHttpResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    // }
+    @ExceptionHandler(FeedNotUserException.class)
+    public ResponseEntity<HttpResponse> feedNotUserException(FeedNotUserException ex) {
+        return this.createHttpResponse(BAD_REQUEST, ex.getMessage());
+    }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<HttpResponse> methodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         HttpMethod supportedMethod = Objects.requireNonNull(ex.getSupportedHttpMethods()).iterator().next();
-        return this.createHttpResponse(HttpStatus.METHOD_NOT_ALLOWED,
+        return this.createHttpResponse(METHOD_NOT_ALLOWED,
                 String.format(METHOD_IS_NOT_ALLOWED, supportedMethod));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpResponse> internalServerErrorException(Exception exception) {
         logger.error(exception.getMessage(), exception);
-        return this.createHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG);
+        return this.createHttpResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG);
     }
 
     @ExceptionHandler(NoResultException.class)
     public ResponseEntity<HttpResponse> notFoundException(NoResultException exception) {
         logger.error(exception.getMessage());
-        return this.createHttpResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+        return this.createHttpResponse(NOT_FOUND, exception.getMessage());
     }
 
     @GetMapping(ERROR_PATH)
     public ResponseEntity<HttpResponse> notFound404() throws Exception {
-        return this.createHttpResponse(HttpStatus.NOT_FOUND, NO_MAPPING_EXIST_URL);
+        return this.createHttpResponse(NOT_FOUND, NO_MAPPING_EXIST_URL);
     }
 }
