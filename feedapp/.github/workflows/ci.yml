@@ -26,4 +26,4 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v1
         with:
           files: "**/surefire-reports/TEST-*.xml"
-          # format: junit
+          format: junit
